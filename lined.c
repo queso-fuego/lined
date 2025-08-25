@@ -96,6 +96,7 @@ bool cmd_write() {
 
 // ($)=: Print line number of given address
 bool cmd_print_address() {
+	if (!have_a1) { a2 = a1 = last_line; have_a1 = true; }
 	printf("%d\n", a1);
 	return true;
 }
@@ -169,10 +170,11 @@ bool next_address(char **ln, int *addr) {
 
 // Get next line range and command to run
 bool next_command() {
-		// Print prompt by default
-		printf("*"), fflush(stdout);
-		// Read in next line addresses and command to run
-		if (!fgets(line, sizeof line, stdin)) return cmd_quit();	// Done with program
+	// Print prompt by default
+	printf("*"), fflush(stdout);
+	// Read in next line addresses and command to run
+	if (!fgets(line, sizeof line, stdin)) return cmd_quit();	// Done with program
+
 	a1 = a2 = a3 = 0;	// Reset addresses
 	have_a1 = have_a2 = have_a3 = false;
 	cmd = '\0';	// Reset command
@@ -184,7 +186,7 @@ bool next_command() {
 		if (have_a2) a1 = a2;
 		if (!have_a1) a1 = (*s == ',') ? 1 : curr_line;	// Default ',' = 1,$ : else ';' = .,$
 		if (*s == ';') curr_line = a1;
-		s++;	// Skip over ,/;
+		s++;	// Skip ,;
 
 		// Get next address 2
 		if (!next_address(&s, &a2)) return false;
@@ -193,6 +195,7 @@ bool next_command() {
 		have_a2 = have_a1 = true;	// Got both addresses now
 	}
 	if (!have_a2) a2 = a1;	// Default to 1st address if needed, e.g. for (.,.) command default lines
+
 	// Get command to run
 	cmd = *s++;
 	if (!cmd_functions[cmd]) return false;	// Invalid/unsupported command
