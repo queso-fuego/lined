@@ -136,6 +136,7 @@ bool next_address(char **ln, int *addr) {
 				if (first) *addr = curr_line;	// Else will offset from current line (addr)
 				// Set addr + or - 1 if single +/-, else +/- number after the sign
 				s++;
+				while (isblank(*s)) s++;
 				if (!isdigit(*s)) *addr += (c == '+') ? 1 : -1;
 				else {
 					*addr += (c == '+') ? atoi(s) : -atoi(s);
