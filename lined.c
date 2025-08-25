@@ -33,6 +33,7 @@ bool cmd_append() {
 
 // (.)i: Same as cmd_append, but add _at_ the given address, _not_ after it
 bool cmd_insert() {
+	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	if (a1 > 0) a1--;
 	return cmd_append();
 }
@@ -195,6 +196,8 @@ bool next_command() {
 		have_a2 = have_a1 = true;	// Got both addresses now
 	}
 	if (!have_a2) a2 = a1;	// Default to 1st address if needed, e.g. for (.,.) command default lines
+
+	if (a1 > a2) return false;	// Addresses must be in ascending order
 
 	// Get command to run
 	cmd = *s++;
