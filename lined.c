@@ -17,7 +17,7 @@ char *str_dup(char *s) {
 }
 
 // (.)a: Append new lines to buffer after given address
-bool cmd_append() {
+bool cmd_append(void) {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	while (fgets(line, sizeof line, stdin)) {
 		if (!strcmp(line, ".\n")) break;	// Done inputting lines with single '.'
@@ -32,14 +32,14 @@ bool cmd_append() {
 }
 
 // (.)i: Same as cmd_append, but add _at_ the given address, _not_ after it
-bool cmd_insert() {
+bool cmd_insert(void) {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	if (a1 > 0) a1--;
 	return cmd_append();
 }
 
 // (.,.)d: Delete line range from buffer
-bool cmd_delete() {
+bool cmd_delete(void) {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	// Free line memory 1st to not have leaks
 	for (int i = a1; i <= a2; i++) free(lines[i]);
@@ -51,12 +51,12 @@ bool cmd_delete() {
 }
 
 // (.,.)c: Delete then add new lines in their place, thereby "changing" those lines
-bool cmd_change() {
+bool cmd_change(void) {
 	return cmd_delete() && cmd_insert();
 }
 
 // (.,.)n: Print lines with their line numbers
-bool cmd_print_with_line_number() {
+bool cmd_print_with_line_number(void) {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	for (int i = a1; i <= a2; i++) printf("%d\t%s", i, lines[i]);
 	curr_line = a2;	// '.' = last valid line printed
@@ -64,7 +64,7 @@ bool cmd_print_with_line_number() {
 }
 
 // (.,.)p: Print line numbers plainly, without their line numbers
-bool cmd_print() {
+bool cmd_print(void) {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
 	for (int i = a1; i <= a2; i++) printf("%s", lines[i]);
 	curr_line = a2;	// '.' = last valid line printed
@@ -72,7 +72,7 @@ bool cmd_print() {
 }
 
 // q: Quit/End the program
-bool cmd_quit() {
+bool cmd_quit(void) {
 	// Free remaining line buffer memory to be nice to the OS [|:^)
 	for (int i = 1; i <= last_line; i++) free(lines[i]);
 	exit(EXIT_SUCCESS);
@@ -80,7 +80,7 @@ bool cmd_quit() {
 }
 
 // (1,$)w: Write lines to current filename
-bool cmd_write() {
+bool cmd_write(void) {
 	if (!have_a1) { a1 = 1; a2 = last_line; have_a1 = true; }
 	FILE *fp = fopen(filename, "w");
 	if (!fp) return false;
@@ -96,7 +96,7 @@ bool cmd_write() {
 }
 
 // ($)=: Print line number of given address
-bool cmd_print_address() {
+bool cmd_print_address(void) {
 	if (!have_a1) { a2 = a1 = last_line; have_a1 = true; }
 	printf("%d\n", a1);
 	return true;
@@ -170,7 +170,7 @@ bool next_address(char **ln, int *addr) {
 }
 
 // Get next line range and command to run
-bool next_command() {
+bool next_command(void) {
 	// Print prompt by default
 	printf("*"), fflush(stdout);
 	// Read in next line addresses and command to run
