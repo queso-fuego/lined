@@ -9,13 +9,6 @@ bool have_a1, have_a2, have_a3;	// Did we parse out addresses from the last comm
 unsigned char cmd;
 char *filename, *cmd_parms;
 
-char *str_dup(char *s) {
-	char *new = malloc(strlen(s) + 1);
-	if (!new) return NULL;
-	strcpy(new, s);
-	return new;
-}
-
 // (.)a: Append new lines to buffer after given address
 bool cmd_append() {
 	if (!have_a1) { a2 = a1 = curr_line; have_a1 = true; }
@@ -24,7 +17,7 @@ bool cmd_append() {
 		a1++;	// Will append after given address 1
 		// Move current buffer lines to make room for new line
 		memmove(&lines[a1+1], &lines[a1], (last_line - a1 + 1) * sizeof *lines);
-		lines[a1] = str_dup(line);
+		lines[a1] = strdup(line);
 		last_line++;	// Added new line to buffer
 	}
 	curr_line = a1;	// '.' = last line added to buffer
@@ -215,7 +208,7 @@ int main(int argc, char **argv) {
 	if (!fp) exit(EXIT_FAILURE);
 	size_t bytes_read = 0;
 	while (fgets(line, sizeof line, fp)) {
-		lines[++last_line] = str_dup(line);
+		lines[++last_line] = strdup(line);
 		bytes_read += strlen(line);
 	}
 	fclose(fp);
